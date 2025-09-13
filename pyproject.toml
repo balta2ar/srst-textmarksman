@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "srst-textmarksman"
+version = "0.1.0"
+description = "OCR and deskew images from the clipboard"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "deskew>=1.5.1",
+    "matplotlib>=3.10.1",
+    "pillow>=11.1.0",
+    "pyperclip>=1.9.0",
+    "pyqt6>=6.8.1",
+    "tesserocr>=2.8.0",
+]
+
+[project.scripts]
+srst-textmarksman = "textmarksman.textmarksman:main"
+srst-textmarkswoman = "textmarksman.textmarkswoman:main"
+
+[tool.setuptools]
+packages = ["textmarksman"]
