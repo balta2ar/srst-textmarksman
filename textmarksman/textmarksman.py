@@ -12,6 +12,8 @@ from PIL import Image, ImageDraw
 # import pytesseract
 import pyperclip
 
+# from textmarksman.unproject.unproject_text import unproject
+
 #from yatetradki.uitools.textmarksman.deskew_wrapper import deskew
 
 EXIT_OK = 0
@@ -62,7 +64,8 @@ def ocr(filename: str, lang: str) -> str:
     # COUNT                    # Number of enum entries.
     #print(pytesseract.image_to_boxes(Image.open(filename), lang=lang))
     modes = [RIL.BLOCK, RIL.PARA, RIL.TEXTLINE, RIL.WORD, RIL.SYMBOL]
-    with PyTessBaseAPI(lang=lang, psm=PSM.SINGLE_COLUMN) as api:
+    path = '/usr/share/tessdata'
+    with PyTessBaseAPI(path=path, lang=lang, psm=PSM.SINGLE_COLUMN) as api:
         api.SetImageFile(filename)
         return api.GetUTF8Text()
 
@@ -104,7 +107,6 @@ def do_generic(engine, filename: Optional[str], lang: str, is_unproject: bool, i
         #text = ocr(filename, 'nor+rus')
         if is_unproject:
             dest = '/tmp/unproject.jpg'
-            from yatetradki.uitools.textmarksman.unproject.unproject_text import unproject
             unproject(filename, dest)
             filename = dest
         text = engine(filename, lang)

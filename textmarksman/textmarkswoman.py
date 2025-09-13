@@ -8,7 +8,11 @@ from os.path import dirname
 from pathlib import Path
 from threading import Thread
 from urllib.request import urlopen
+from shutil import which
+from subprocess import run
 
+def run_slurp(cmd):
+    p = run(cmd)
 
 def is_interactive():
     import __main__ as main
@@ -65,7 +69,9 @@ class WatchDog:
 
 
 DIR = Path(dirname(__file__))
-ICON_FILENAME = str(DIR / 'ocr.png')
+ICON_FILENAME = str(DIR / '../ocr.png')
+print('DIR=', DIR)
+print('ICON_FILENAME=', ICON_FILENAME)
 WATCHDOG_HOST = 'localhost'
 WATCHDOG_PORT = 6650
 dog = WatchDog(WATCHDOG_HOST, WATCHDOG_PORT)
@@ -83,8 +89,9 @@ from PyQt6.QtWidgets import QMenu
 from PyQt6.QtWidgets import QSystemTrayIcon
 from PyQt6.QtWidgets import QWidget
 
-from yatetradki.uitools.textmarksman.textmarksman import do_easyocr
-from yatetradki.uitools.textmarksman.textmarksman import do_tesseract
+from textmarksman.textmarksman import do_easyocr
+from textmarksman.textmarksman import do_tesseract
+from textmarksman.textmarksman import notify
 
 
 def remap(src, mapping) -> [str]:
@@ -133,11 +140,14 @@ class SystemTrayIcon(QSystemTrayIcon):
         self.eng_paddleocr.setCheckable(True)
         self.eng_mmocr = menu.addAction("mmocr")
         self.eng_mmocr.setCheckable(True)
+        self.eng_gemini = menu.addAction("gemini")
+        self.eng_gemini.setCheckable(True)
         engine_group = QActionGroup(menu)
         engine_group.addAction(self.eng_tesseract)
         engine_group.addAction(self.eng_easyocr)
         engine_group.addAction(self.eng_paddleocr)
         engine_group.addAction(self.eng_mmocr)
+        engine_group.addAction(self.eng_gemini)
 
         menu.addSeparator()
 
@@ -173,6 +183,13 @@ class SystemTrayIcon(QSystemTrayIcon):
         if self.eng_easyocr.isChecked():
             langs = ','.join(self.langs())
             do_easyocr(filename, langs, unproject, pronounce)
+        if self.eng_gemini.isChecked():
+            bin = which('select-ocr-copy')
+            if bin:
+                run_slurp([bin])
+            else:
+                notify('Error', 'select-ocr-copy not found in PATH')
+
 
 def main():
     signal.signal(signal.SIGINT, signal.SIG_DFL)
